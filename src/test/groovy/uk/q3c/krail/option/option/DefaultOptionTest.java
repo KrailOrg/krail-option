@@ -13,34 +13,53 @@
 
 package uk.q3c.krail.option.option;
 
+import net.engio.mbassy.bus.common.PubSubSupport;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
+import uk.q3c.krail.eventbus.BusMessage;
+import uk.q3c.krail.eventbus.GlobalBusProvider;
 import uk.q3c.krail.i18n.I18NKey;
-import uk.q3c.krail.option.*;
+import uk.q3c.krail.option.Option;
+import uk.q3c.krail.option.OptionContext;
+import uk.q3c.krail.option.OptionKey;
+import uk.q3c.krail.option.OptionPermissionFailedException;
+import uk.q3c.krail.option.UserHierarchy;
 import uk.q3c.krail.option.persist.OptionCache;
 import uk.q3c.krail.option.persist.OptionCacheKey;
 import uk.q3c.krail.option.test.MockOptionContext;
 import uk.q3c.krail.option.test.MockOptionPermissionVerifier;
 
+import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.*;
-import static uk.q3c.krail.option.RankOption.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static uk.q3c.krail.option.RankOption.HIGHEST_RANK;
+import static uk.q3c.krail.option.RankOption.LOWEST_RANK;
+import static uk.q3c.krail.option.RankOption.SPECIFIC_RANK;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DefaultOptionTest {
 
     DefaultOption option;
     MockOptionContext contextObject;
-    MockContext2 contextObject2;
     Class<MockOptionContext> context = MockOptionContext.class;
     Class<MockContext2> context2 = MockContext2.class;
+
+    @Mock
+    GlobalBusProvider globalBusProvider;
+
+    @Mock
+    PubSubSupport<BusMessage> globalBus;
+
     @Mock
     private UserHierarchy defaultHierarchy;
     @Mock
@@ -49,14 +68,18 @@ public class DefaultOptionTest {
     private OptionKey<Integer> optionKey2;
     private MockOptionPermissionVerifier permissionVerifier;
 
+    ArgumentCaptor<OptionChangeMessage> messageCaptor;
+
     @Before
     public void setup() {
         permissionVerifier = new MockOptionPermissionVerifier();
         when(defaultHierarchy.highestRankName()).thenReturn("ds");
+        when(globalBusProvider.get()).thenReturn(globalBus);
         contextObject = new MockOptionContext();
-        option = new DefaultOption(optionCache, defaultHierarchy, permissionVerifier);
+        option = new DefaultOption(optionCache, defaultHierarchy, permissionVerifier, globalBusProvider);
         optionKey1 = new OptionKey<>(5, context, TestLabelKey.key1, "q");
         optionKey2 = new OptionKey<>(5, context2, TestLabelKey.key1, "q");
+        messageCaptor = ArgumentCaptor.forClass(OptionChangeMessage.class);
     }
 
     @Test(expected = OptionPermissionFailedException.class)
@@ -72,13 +95,23 @@ public class DefaultOptionTest {
     @Test
     public void set_simplest() {
         //given
+
         when(defaultHierarchy.rankName(0)).thenReturn("specific");
         OptionCacheKey<Integer> cacheKey = new OptionCacheKey<>(defaultHierarchy, SPECIFIC_RANK, 0, optionKey1);
         //when
-        option.set(optionKey1, 5);
+        option.set(optionKey1, 3);
         //then
-        verify(optionCache).write(cacheKey, Optional.of(5));
+        verify(optionCache).write(cacheKey, Optional.of(3));
         assertThat(option.getHierarchy()).isEqualTo(defaultHierarchy);
+        verify(globalBus).publish(messageCaptor.capture());
+        List<OptionChangeMessage> messages = messageCaptor.getAllValues();
+        assertThat(messages.size()).isEqualTo(1);
+        OptionChangeMessage msg = messages.get(0);
+        assertThat(msg.getHierarchy()).isEqualTo(defaultHierarchy);
+        assertThat(msg.getHierarchyRank()).isEqualTo(0);
+        assertThat(msg.getOptionKey()).isEqualTo(optionKey1);
+        assertThat(msg.getNewValue()).isEqualTo(3);
+        assertThat(msg.getOldValue()).isEqualTo(5);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -183,8 +216,17 @@ public class DefaultOptionTest {
         //when
         Object actual = option.delete(optionKey2, 1);
         //then
-        assertThat(actual).isEqualTo(Optional.of(3));
+        assertThat(actual).isEqualTo(3);
         verify(optionCache).delete(cacheKey);
+        verify(globalBus).publish(messageCaptor.capture());
+        List<OptionChangeMessage> messages = messageCaptor.getAllValues();
+        assertThat(messages.size()).isEqualTo(1);
+        OptionChangeMessage msg = messages.get(0);
+        assertThat(msg.getHierarchy()).isEqualTo(defaultHierarchy);
+        assertThat(msg.getHierarchyRank()).isEqualTo(1);
+        assertThat(msg.getOptionKey()).isEqualTo(optionKey2);
+        assertThat(msg.getNewValue()).isEqualTo(null);
+        assertThat(msg.getOldValue()).isEqualTo(3);
     }
 
     @Test(expected = OptionPermissionFailedException.class)

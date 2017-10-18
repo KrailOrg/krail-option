@@ -13,7 +13,14 @@
 
 package uk.q3c.krail.option.option;
 
-import uk.q3c.krail.option.*;
+import uk.q3c.krail.eventbus.GlobalBusProvider;
+import uk.q3c.krail.option.Option;
+import uk.q3c.krail.option.OptionEditAction;
+import uk.q3c.krail.option.OptionKey;
+import uk.q3c.krail.option.OptionPermissionFailedException;
+import uk.q3c.krail.option.OptionPermissionVerifier;
+import uk.q3c.krail.option.RankOption;
+import uk.q3c.krail.option.UserHierarchy;
 import uk.q3c.krail.option.persist.OptionCache;
 import uk.q3c.krail.option.persist.OptionCacheKey;
 import uk.q3c.krail.option.persist.OptionDaoDelegate;
@@ -21,15 +28,18 @@ import uk.q3c.krail.option.persist.cache.DefaultOptionCacheLoader;
 
 import java.util.Optional;
 
-import static com.google.common.base.Preconditions.*;
-import static uk.q3c.krail.option.RankOption.*;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static uk.q3c.krail.option.RankOption.HIGHEST_RANK;
+import static uk.q3c.krail.option.RankOption.LOWEST_RANK;
+import static uk.q3c.krail.option.RankOption.SPECIFIC_RANK;
 
 /**
  * Base implementation for {@link Option}. Uses {@link OptionCache}, which is configured to use some form of
  * persistence. All calls reference an implementation of {@link UserHierarchy}, either directly as a method
  * parameter, or by defaulting to {@link #hierarchy}.  The get() and set() default to using the highest rank
- * from {@link UserHierarchy}.  For getting or setting values at a specific hierarchyRank use the getSpecific() and
- * setSpecific() methods. The delete() method is always specific
+ * from {@link UserHierarchy}.  For getting or setting values at a specific hierarchyRank use the getSpecific() method, and
+ * the set() methods which specify a rank. The delete() method is always specific
  * <br>
  * To create a hierarchy specific implementation, simply sub-class with the alternative hierarchy injected into it.
  * <br>
@@ -47,11 +57,13 @@ public abstract class OptionBase implements Option {
     private UserHierarchy hierarchy;
     private OptionCache optionCache;
     private OptionPermissionVerifier permissionVerifier;
+    private GlobalBusProvider globalBusProvider;
 
-    protected OptionBase(OptionCache optionCache, UserHierarchy hierarchy, OptionPermissionVerifier permissionVerifier) {
+    protected OptionBase(OptionCache optionCache, UserHierarchy hierarchy, OptionPermissionVerifier permissionVerifier, GlobalBusProvider globalBusProvider) {
         this.hierarchy = hierarchy;
         this.optionCache = optionCache;
         this.permissionVerifier = permissionVerifier;
+        this.globalBusProvider = globalBusProvider;
     }
 
     @Override
@@ -69,7 +81,10 @@ public abstract class OptionBase implements Option {
         checkArgument(hierarchyRank >= 0);
         checkNotNull(optionKey);
         if (permissionVerifier.userHasPermission(OptionEditAction.EDIT, hierarchy, hierarchyRank, optionKey)) {
+            T oldValue = getSpecificRanked(hierarchyRank, optionKey);
             optionCache.write(new OptionCacheKey<>(hierarchy, SPECIFIC_RANK, hierarchyRank, optionKey), Optional.of(value));
+            OptionChangeMessage<T> event = new OptionChangeMessage<>(optionKey, hierarchy, hierarchyRank, oldValue, value);
+            globalBusProvider.get().publish(event);
         } else {
             throw new OptionPermissionFailedException("Permission to edit option refused");
         }
@@ -89,11 +104,7 @@ public abstract class OptionBase implements Option {
         if (optionalValue == null) {
             return defaultValue;
         }
-        if (optionalValue.isPresent()) {
-            return optionalValue.get();
-        } else {
-            return defaultValue;
-        }
+        return optionalValue.orElse(defaultValue);
     }
 
 
@@ -108,16 +119,13 @@ public abstract class OptionBase implements Option {
     public synchronized <T> T getSpecificRanked(int hierarchyRank, OptionKey<T> optionKey) {
         checkNotNull(optionKey);
         T defaultValue = optionKey.getDefaultValue();
+        //noinspection unchecked
         Optional<T> optionalValue = optionCache.get(Optional.of(defaultValue), new OptionCacheKey(hierarchy, SPECIFIC_RANK, hierarchyRank, optionKey));
 
         if (optionalValue == null) {
             return defaultValue;
         }
-        if (optionalValue.isPresent()) {
-            return optionalValue.get();
-        } else {
-            return defaultValue;
-        }
+        return optionalValue.orElse(defaultValue);
     }
 
 
@@ -128,7 +136,11 @@ public abstract class OptionBase implements Option {
         checkNotNull(optionKey);
         if (permissionVerifier.userHasPermission(OptionEditAction.EDIT, hierarchy, hierarchyRank, optionKey)) {
             //noinspection unchecked
-            return (T) optionCache.delete(new OptionCacheKey(hierarchy, SPECIFIC_RANK, hierarchyRank, optionKey));
+            Optional<T> oldValueOpt = (Optional<T>) optionCache.delete(new OptionCacheKey(hierarchy, SPECIFIC_RANK, hierarchyRank, optionKey));
+            T oldValue = oldValueOpt.orElse(null);
+            OptionChangeMessage<T> event = new OptionChangeMessage<>(optionKey, hierarchy, hierarchyRank, oldValue, true);
+            globalBusProvider.get().publish(event);
+            return oldValue;
         } else {
             throw new OptionPermissionFailedException("Permission to edit option refused");
         }
