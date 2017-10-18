@@ -38,7 +38,7 @@ public class MockOption implements Option {
     private Map<OptionKey, Optional<Object>> optionMap;
 
     @Inject
-    protected MockOption() {
+    public MockOption() {
         optionMap = new HashMap<>();
         when(hierarchy.lowestRank()).thenReturn(5);
     }
