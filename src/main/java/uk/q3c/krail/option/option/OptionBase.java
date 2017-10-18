@@ -15,6 +15,7 @@ package uk.q3c.krail.option.option;
 
 import uk.q3c.krail.eventbus.GlobalBusProvider;
 import uk.q3c.krail.option.Option;
+import uk.q3c.krail.option.OptionChangeMessage;
 import uk.q3c.krail.option.OptionEditAction;
 import uk.q3c.krail.option.OptionKey;
 import uk.q3c.krail.option.OptionPermissionFailedException;

@@ -26,6 +26,7 @@ import uk.q3c.krail.eventbus.BusMessage;
 import uk.q3c.krail.eventbus.GlobalBusProvider;
 import uk.q3c.krail.i18n.I18NKey;
 import uk.q3c.krail.option.Option;
+import uk.q3c.krail.option.OptionChangeMessage;
 import uk.q3c.krail.option.OptionContext;
 import uk.q3c.krail.option.OptionKey;
 import uk.q3c.krail.option.OptionPermissionFailedException;
