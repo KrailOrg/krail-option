@@ -11,7 +11,7 @@
  *
  */
 
-package uk.q3c.krail.option.test;
+package uk.q3c.krail.option.mock;
 
 import com.google.inject.Inject;
 import uk.q3c.krail.option.Option;
@@ -22,8 +22,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.google.common.base.Preconditions.*;
-import static org.mockito.Mockito.*;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Note that this wil lnto necessarily convert data types correctly

@@ -1,6 +1,10 @@
-package uk.q3c.krail.option.test;
+package uk.q3c.krail.option.mock;
 
-import uk.q3c.krail.option.*;
+import uk.q3c.krail.option.OptionEditAction;
+import uk.q3c.krail.option.OptionKey;
+import uk.q3c.krail.option.OptionPermissionFailedException;
+import uk.q3c.krail.option.OptionPermissionVerifier;
+import uk.q3c.krail.option.UserHierarchy;
 
 /**
  * Created by David Sowerby on 09 Aug 2017

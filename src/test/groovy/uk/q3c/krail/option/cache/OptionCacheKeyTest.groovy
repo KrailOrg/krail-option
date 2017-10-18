@@ -18,8 +18,8 @@ import uk.q3c.krail.i18n.test.MockLabelKey
 import uk.q3c.krail.option.OptionKey
 import uk.q3c.krail.option.RankOption
 import uk.q3c.krail.option.UserHierarchy
+import uk.q3c.krail.option.mock.MockOptionContext
 import uk.q3c.krail.option.persist.OptionCacheKey
-import uk.q3c.krail.option.test.MockOptionContext
 
 /**
  * Created by David Sowerby on 22 Jan 2016

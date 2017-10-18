@@ -11,7 +11,7 @@
  *
  */
 
-package uk.q3c.krail.option.test;
+package uk.q3c.krail.option.mock;
 
 import uk.q3c.krail.option.Option;
 import uk.q3c.krail.option.bind.OptionModule;

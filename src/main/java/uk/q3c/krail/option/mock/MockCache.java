@@ -11,7 +11,7 @@
  *
  */
 
-package uk.q3c.krail.option.test;
+package uk.q3c.krail.option.mock;
 
 import com.google.common.cache.CacheStats;
 import com.google.common.cache.LoadingCache;

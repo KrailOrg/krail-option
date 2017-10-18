@@ -14,7 +14,6 @@ buildscript {
     ext.kaytee_plugin_version = "0.18.10.0"
     repositories {
         jcenter()
-        mavenLocal()
     }
 
     dependencies {
@@ -28,7 +27,6 @@ group = 'uk.q3c.krail'
 apply plugin: 'uk.q3c.kaytee'
 
 repositories {
-    mavenLocal()
     jcenter()
     mavenCentral()
 
@@ -42,7 +40,7 @@ sourceCompatibility = '1.8'
 
 kaytee {
     version {
-        number = "0.11.0.0"
+        number = "0.11.1.0"
     }
 }
 
@@ -52,9 +50,10 @@ bintray {
 }
 
 dependencies {
-    compile 'uk.q3c.krail:krail-i18n:0.10.0.0.c625203'
+    compile 'uk.q3c.krail:krail-option-api:0.15.1.0'
+    compile 'uk.q3c.krail:krail-i18n:0.10.1.0'
     compile 'org.reflections:reflections:0.9.10'
-    testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
+    testCompile 'org.spockframework:spock-core:1.1-groovy-2.4'
     testCompile 'cglib:cglib-nodep:3.2.0' // needed for Spock mocking
     testCompile 'org.mockito:mockito-all:1.10.19'
     testCompile 'org.assertj:assertj-core:' + assertjVersion

@@ -30,10 +30,10 @@ import uk.q3c.krail.option.OptionContext;
 import uk.q3c.krail.option.OptionKey;
 import uk.q3c.krail.option.OptionPermissionFailedException;
 import uk.q3c.krail.option.UserHierarchy;
+import uk.q3c.krail.option.mock.MockOptionContext;
+import uk.q3c.krail.option.mock.MockOptionPermissionVerifier;
 import uk.q3c.krail.option.persist.OptionCache;
 import uk.q3c.krail.option.persist.OptionCacheKey;
-import uk.q3c.krail.option.test.MockOptionContext;
-import uk.q3c.krail.option.test.MockOptionPermissionVerifier;
 
 import java.util.List;
 import java.util.Optional;
@@ -244,7 +244,7 @@ public class DefaultOptionTest {
         key1, Blank, Large, Private_Static, Static, key2
     }
 
-    static class MockContext2 implements OptionContext<Object> {
+    static class MockContext2 implements OptionContext {
 
         public static final OptionKey<Integer> key3 = new OptionKey<>(125, MockContext2.class, TestLabelKey.Static, TestLabelKey.Large);
         private static final OptionKey<Integer> key4 = new OptionKey<>(126, MockContext2.class, TestLabelKey.Private_Static, TestLabelKey.Large);
@@ -257,10 +257,7 @@ public class DefaultOptionTest {
             return null;
         }
 
-        @Override
-        public void optionValueChanged(Object event) {
 
-        }
 
 
     }
