@@ -29,7 +29,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Note that this wil lnto necessarily convert data types correctly
+ * Note that this will not necessarily convert data types correctly
  * <p>
  * Created by David Sowerby on 27/02/15.
  */
@@ -104,6 +104,11 @@ public class MockOption implements Option {
     @Override
     public OptionCache cache() {
         return optionCache;
+    }
+
+    @Override
+    public <T> Optional<T> getValueFromCache(OptionKey<T> key, int hierarchyRank) {
+        throw new UnsupportedOperationException("Method 'getValueFromCache' is not supported by MockOption");
     }
 
 

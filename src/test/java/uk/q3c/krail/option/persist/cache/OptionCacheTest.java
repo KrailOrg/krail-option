@@ -12,8 +12,7 @@ import uk.q3c.krail.persist.inmemory.InMemoryModule;
 import uk.q3c.util.UtilModule;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.q3c.krail.option.AContext.*;
-import static uk.q3c.krail.option.AContext.key1;
+import static uk.q3c.krail.option.persist.cache.AContext.key1;
 
 /**
  * Created by David Sowerby on 19 Oct 2017
