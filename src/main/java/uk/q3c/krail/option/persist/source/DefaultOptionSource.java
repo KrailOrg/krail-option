@@ -27,7 +27,7 @@ import uk.q3c.util.MessageFormat;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 
-import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Default implementation for {@link OptionSource}.
@@ -64,7 +64,7 @@ public class DefaultOptionSource implements OptionSource {
     protected void checkAnnotationKey(Class<? extends Annotation> annotationClass) {
         checkNotNull(annotationClass);
         if (!optionDaoProviders.containsKey(annotationClass)) {
-            String msg = MessageFormat.format("The OptionDaoDelegate annotation of '{0}' does not match any of the providers.", annotationClass.getSimpleName
+            String msg = MessageFormat.format("The OptionDaoDelegate annotation of '{0}' does not match any of the providers. Have you enabled the Dao, for example:' new InMemoryModule().provideOptionDao()'", annotationClass.getSimpleName
                     ());
             throw new OptionConfigurationException(msg);
         }

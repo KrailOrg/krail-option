@@ -15,21 +15,24 @@ package uk.q3c.krail.option.persist.dao;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import uk.q3c.krail.option.Option;
 import uk.q3c.krail.option.OptionException;
 import uk.q3c.krail.option.OptionKeyException;
 import uk.q3c.krail.option.RankOption;
-import uk.q3c.krail.option.persist.*;
+import uk.q3c.krail.option.persist.OptionCache;
+import uk.q3c.krail.option.persist.OptionCacheKey;
+import uk.q3c.krail.option.persist.OptionDao;
+import uk.q3c.krail.option.persist.OptionDaoDelegate;
+import uk.q3c.krail.option.persist.OptionSource;
 import uk.q3c.krail.option.persist.cache.DefaultOptionCacheLoader;
-import uk.q3c.krail.persist.inmemory.InMemoryOptionStore;
 import uk.q3c.krail.persist.inmemory.store.DefaultInMemoryOptionStore;
 import uk.q3c.util.data.DataConverter;
 import uk.q3c.util.data.collection.DataList;
 
 import java.util.Optional;
 
-import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Data Access Object for {@link DefaultInMemoryOptionStore}
@@ -39,10 +42,8 @@ import static com.google.common.base.Preconditions.*;
  * <br>
  * Created by David Sowerby on 20/02/15.
  */
-@SuppressFBWarnings("FCBL_FIELD_COULD_BE_LOCAL") //injected
 public class DefaultOptionDao implements OptionDao {
 
-    private InMemoryOptionStore optionStore;
     private DataConverter dataConverter;
     private OptionDaoDelegate delegate;
 
@@ -97,6 +98,7 @@ public class DefaultOptionDao implements OptionDao {
         }
 
         if (optionalStringValue.isPresent()) {
+            // use the default value to establish data type
             V defaultValue = cacheKey.getOptionKey()
                     .getDefaultValue();
             if (defaultValue instanceof DataList) {

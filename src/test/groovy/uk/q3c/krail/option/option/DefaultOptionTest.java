@@ -241,6 +241,7 @@ public class DefaultOptionTest {
         //then
     }
 
+
     enum TestLabelKey implements I18NKey {
         key1, Blank, Large, Private_Static, Static, key2
     }

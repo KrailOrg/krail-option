@@ -22,12 +22,17 @@ import uk.q3c.krail.option.Option;
 import uk.q3c.krail.option.RankOption;
 import uk.q3c.krail.option.UserHierarchy;
 import uk.q3c.krail.option.bind.OptionModule;
-import uk.q3c.krail.option.persist.*;
+import uk.q3c.krail.option.persist.OptionCache;
+import uk.q3c.krail.option.persist.OptionCacheKey;
+import uk.q3c.krail.option.persist.OptionCacheProvider;
+import uk.q3c.krail.option.persist.OptionDao;
+import uk.q3c.krail.option.persist.OptionDaoDelegate;
 
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentMap;
 
-import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Provides a cache implementation for {@link Option}.  The {@code get()} methods use the value of the {@link OptionCacheKey} to determine which {@link
@@ -53,11 +58,6 @@ public class DefaultOptionCache implements OptionCache {
     public DefaultOptionCache(OptionDao daoWrapper, OptionCacheProvider cacheProvider) {
         this.daoWrapper = daoWrapper;
         cache = cacheProvider.get();
-    }
-
-    @Override
-    public LoadingCache<OptionCacheKey, Optional<?>> getCache() {
-        return cache;
     }
 
     /**
@@ -134,7 +134,14 @@ public class DefaultOptionCache implements OptionCache {
     @Override
     public synchronized Optional<?> getIfPresent(OptionCacheKey<?> optionCacheKey) {
         checkNotNull(optionCacheKey);
-        return cache.getIfPresent(optionCacheKey);
+        Optional<?> cachedValue = cache.getIfPresent(optionCacheKey);
+        if (cachedValue == null || (!cachedValue.isPresent())) {
+            log.debug("cache does not contain a value for {}", optionCacheKey);
+            return Optional.empty();
+        } else {
+            log.debug("cached for {} value is {}", optionCacheKey, cachedValue.get());
+            return cachedValue;
+        }
     }
 
     @Override
@@ -166,5 +173,10 @@ public class DefaultOptionCache implements OptionCache {
         cache.cleanUp();
     }
 
+    public ConcurrentMap<OptionCacheKey, Optional<?>> asMap() {
+        return cache.asMap();
+    }
+
 
 }
+

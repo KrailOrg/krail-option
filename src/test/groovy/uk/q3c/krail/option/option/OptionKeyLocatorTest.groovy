@@ -16,8 +16,13 @@ package uk.q3c.krail.option.option
 import com.google.common.collect.ImmutableList
 import org.apache.commons.collections15.ListUtils
 import spock.lang.Specification
+import uk.q3c.krail.option.Option
+import uk.q3c.krail.option.OptionKey
+import uk.q3c.krail.option.persist.cache.AContext
 import uk.q3c.util.data.collection.AnnotationList
 import uk.q3c.util.data.collection.DataList
+
+import static org.mockito.Mockito.*
 
 /**
  *
@@ -26,6 +31,7 @@ import uk.q3c.util.data.collection.DataList
 class OptionKeyLocatorTest extends Specification {
 
     OptionKeyLocator locator
+    Option option = mock(Option)
 
     def setup() {
         locator = new OptionKeyLocator()
@@ -47,5 +53,16 @@ class OptionKeyLocatorTest extends Specification {
 //        actual.containsAll(expected) not all key types are used
         diff.isEmpty() // trap any new ones which get added but may not be in DataConverter
 
+    }
+
+    def "context key map"() {
+
+        when:
+        Map<OptionKey, Class<?>> map = locator.contextKeyMap(new AContext(option))
+
+        then:
+        map.size() == 2
+        map.containsKey(AContext.key1)
+        map.containsKey(AContext.key2)
     }
 }

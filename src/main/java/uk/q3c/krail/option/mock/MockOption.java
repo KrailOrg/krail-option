@@ -17,6 +17,7 @@ import com.google.inject.Inject;
 import uk.q3c.krail.option.Option;
 import uk.q3c.krail.option.OptionKey;
 import uk.q3c.krail.option.UserHierarchy;
+import uk.q3c.krail.option.persist.OptionCache;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,6 +37,7 @@ public class MockOption implements Option {
 
     private UserHierarchy hierarchy = mock(UserHierarchy.class);
     private Map<OptionKey, Optional<Object>> optionMap;
+    private OptionCache optionCache = mock(OptionCache.class);
 
     @Inject
     public MockOption() {
@@ -97,6 +99,11 @@ public class MockOption implements Option {
         checkNotNull(optionKey);
 
         return (T) optionMap.remove(optionKey);
+    }
+
+    @Override
+    public OptionCache cache() {
+        return optionCache;
     }
 
 

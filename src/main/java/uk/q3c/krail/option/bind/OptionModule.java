@@ -15,6 +15,7 @@ package uk.q3c.krail.option.bind;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Binder;
+import com.google.inject.Singleton;
 import uk.q3c.krail.option.Option;
 import uk.q3c.krail.option.OptionPermissionVerifier;
 import uk.q3c.krail.option.UserHierarchy;
@@ -22,7 +23,13 @@ import uk.q3c.krail.option.UserHierarchyDefault;
 import uk.q3c.krail.option.hierarchy.DefaultOptionPermissionVerifier;
 import uk.q3c.krail.option.hierarchy.DefaultUserHierarchy;
 import uk.q3c.krail.option.option.DefaultOption;
-import uk.q3c.krail.option.persist.*;
+import uk.q3c.krail.option.persist.ActiveOptionSourceDefault;
+import uk.q3c.krail.option.persist.OptionCache;
+import uk.q3c.krail.option.persist.OptionCacheConfig;
+import uk.q3c.krail.option.persist.OptionCacheProvider;
+import uk.q3c.krail.option.persist.OptionDao;
+import uk.q3c.krail.option.persist.OptionPersistenceHelper;
+import uk.q3c.krail.option.persist.OptionSource;
 import uk.q3c.krail.option.persist.cache.DefaultOptionCache;
 import uk.q3c.krail.option.persist.cache.DefaultOptionCacheProvider;
 import uk.q3c.krail.option.persist.dao.DefaultOptionDao;
@@ -106,11 +113,12 @@ public class OptionModule extends AbstractModule {
 
 
     /**
-     * Override this method to provide your own {@link OptionCache} implementation or change the scope - the scope is
-     * generally expected to be something which relates to individual users.
+     * Override this method to provide your own {@link OptionCache} implementation or change the scope.  It is difficult to predict which
+     * scope would be most effective for any given application, but given that everything except the user level values of options
+     * are shared among all users, Singleton seems most appropriate for most cases.
      */
     protected void bindOptionCache() {
-        bind(OptionCache.class).to(DefaultOptionCache.class);
+        bind(OptionCache.class).to(DefaultOptionCache.class).in(Singleton.class);
     }
 
     protected void bindOptionCacheConfiguration() {

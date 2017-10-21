@@ -73,6 +73,14 @@ public abstract class OptionBase implements Option {
     }
 
     @Override
+    public OptionCache cache() {
+        return optionCache;
+    }
+
+
+
+
+    @Override
     public <T> void set(OptionKey<T> optionKey, T value) {
         set(optionKey, 0, value);
     }
@@ -127,6 +135,14 @@ public abstract class OptionBase implements Option {
             return defaultValue;
         }
         return optionalValue.orElse(defaultValue);
+    }
+
+    @Override
+    public <T> Optional<T> getValueFromCache(OptionKey<T> optionKey, int hierarchyRank) {
+        checkNotNull(optionKey);
+        //noinspection unchecked
+        Optional<T> value = (Optional<T>) optionCache.getIfPresent(new OptionCacheKey(hierarchy, SPECIFIC_RANK, hierarchyRank, optionKey));
+        return value;
     }
 
 
