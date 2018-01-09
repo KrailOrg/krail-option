@@ -4,7 +4,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.junit.Before;
 import org.junit.Test;
-import uk.q3c.krail.eventbus.mbassador.GlobalBusModule;
+import uk.q3c.krail.eventbus.mbassador.EventBusModule;
 import uk.q3c.krail.option.Option;
 import uk.q3c.krail.option.bind.OptionModule;
 import uk.q3c.krail.persist.InMemory;
@@ -25,7 +25,7 @@ public class OptionCacheTest {
 
     @Before
     public void setup() {
-        injector = Guice.createInjector(new OptionModule().activeSource(InMemory.class), new InMemoryModule().provideOptionDao(), new UtilModule(), new GlobalBusModule());
+        injector = Guice.createInjector(new OptionModule().activeSource(InMemory.class), new InMemoryModule().provideOptionDao(), new UtilModule(), new EventBusModule());
         option = injector.getInstance(Option.class);
         optionContext = injector.getInstance(AContext.class);
     }
@@ -52,6 +52,7 @@ public class OptionCacheTest {
         // then
         assertThat(option.getValueFromCache(key1, 0)).isPresent();
         assertThat(option.getValueFromCache(key1, 0).get()).isEqualTo(999);
+        Thread.sleep(200); // wait for async message
         assertThat(optionContext.optionValue).isEqualTo(999);
     }
 }

@@ -13,7 +13,6 @@
 
 package uk.q3c.krail.option.option;
 
-import net.engio.mbassy.bus.common.PubSubSupport;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,8 +21,8 @@ import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
-import uk.q3c.krail.eventbus.BusMessage;
-import uk.q3c.krail.eventbus.GlobalBusProvider;
+import uk.q3c.krail.eventbus.MessageBus;
+import uk.q3c.krail.eventbus.MessageBusProvider;
 import uk.q3c.krail.i18n.I18NKey;
 import uk.q3c.krail.option.Option;
 import uk.q3c.krail.option.OptionChangeMessage;
@@ -56,10 +55,10 @@ public class DefaultOptionTest {
     Class<MockContext2> context2 = MockContext2.class;
 
     @Mock
-    GlobalBusProvider globalBusProvider;
+    MessageBusProvider singletonMessageBusProvider;
 
     @Mock
-    PubSubSupport<BusMessage> globalBus;
+    MessageBus globalBus;
 
     @Mock
     private UserHierarchy defaultHierarchy;
@@ -75,9 +74,9 @@ public class DefaultOptionTest {
     public void setup() {
         permissionVerifier = new MockOptionPermissionVerifier();
         when(defaultHierarchy.highestRankName()).thenReturn("ds");
-        when(globalBusProvider.get()).thenReturn(globalBus);
+        when(singletonMessageBusProvider.get()).thenReturn(globalBus);
         contextObject = new MockOptionContext();
-        option = new DefaultOption(optionCache, defaultHierarchy, permissionVerifier, globalBusProvider);
+        option = new DefaultOption(optionCache, defaultHierarchy, permissionVerifier, singletonMessageBusProvider);
         optionKey1 = new OptionKey<>(5, context, TestLabelKey.key1, "q");
         optionKey2 = new OptionKey<>(5, context2, TestLabelKey.key1, "q");
         messageCaptor = ArgumentCaptor.forClass(OptionChangeMessage.class);
@@ -104,7 +103,7 @@ public class DefaultOptionTest {
         //then
         verify(optionCache).write(cacheKey, Optional.of(3));
         assertThat(option.getHierarchy()).isEqualTo(defaultHierarchy);
-        verify(globalBus).publish(messageCaptor.capture());
+        verify(globalBus).publishASync(messageCaptor.capture());
         List<OptionChangeMessage> messages = messageCaptor.getAllValues();
         assertThat(messages.size()).isEqualTo(1);
         OptionChangeMessage msg = messages.get(0);
@@ -219,7 +218,7 @@ public class DefaultOptionTest {
         //then
         assertThat(actual).isEqualTo(3);
         verify(optionCache).delete(cacheKey);
-        verify(globalBus).publish(messageCaptor.capture());
+        verify(globalBus).publishASync(messageCaptor.capture());
         List<OptionChangeMessage> messages = messageCaptor.getAllValues();
         assertThat(messages.size()).isEqualTo(1);
         OptionChangeMessage msg = messages.get(0);

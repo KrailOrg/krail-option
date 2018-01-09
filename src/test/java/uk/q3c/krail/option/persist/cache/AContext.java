@@ -12,7 +12,7 @@ import uk.q3c.krail.option.OptionKey;
 /**
  * Created by David Sowerby on 20 Oct 2017
  */
-@Listener
+@Listener()
 public class AContext implements OptionContext {
 
     public static final OptionKey<Integer> key1 = new OptionKey<>(125, AContext.class, TestLabelKey.Static, TestLabelKey.Large);

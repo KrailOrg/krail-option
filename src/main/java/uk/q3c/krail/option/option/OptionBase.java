@@ -13,7 +13,7 @@
 
 package uk.q3c.krail.option.option;
 
-import uk.q3c.krail.eventbus.GlobalBusProvider;
+import uk.q3c.krail.eventbus.MessageBusProvider;
 import uk.q3c.krail.option.Option;
 import uk.q3c.krail.option.OptionChangeMessage;
 import uk.q3c.krail.option.OptionEditAction;
@@ -58,9 +58,9 @@ public abstract class OptionBase implements Option {
     private UserHierarchy hierarchy;
     private OptionCache optionCache;
     private OptionPermissionVerifier permissionVerifier;
-    private GlobalBusProvider globalBusProvider;
+    private MessageBusProvider globalBusProvider;
 
-    protected OptionBase(OptionCache optionCache, UserHierarchy hierarchy, OptionPermissionVerifier permissionVerifier, GlobalBusProvider globalBusProvider) {
+    protected OptionBase(OptionCache optionCache, UserHierarchy hierarchy, OptionPermissionVerifier permissionVerifier, MessageBusProvider globalBusProvider) {
         this.hierarchy = hierarchy;
         this.optionCache = optionCache;
         this.permissionVerifier = permissionVerifier;
@@ -93,7 +93,7 @@ public abstract class OptionBase implements Option {
             T oldValue = getSpecificRanked(hierarchyRank, optionKey);
             optionCache.write(new OptionCacheKey<>(hierarchy, SPECIFIC_RANK, hierarchyRank, optionKey), Optional.of(value));
             OptionChangeMessage<T> event = new OptionChangeMessage<>(optionKey, hierarchy, hierarchyRank, oldValue, value);
-            globalBusProvider.get().publish(event);
+            globalBusProvider.get().publishASync(event);
         } else {
             throw new OptionPermissionFailedException("Permission to edit option refused");
         }
@@ -156,7 +156,7 @@ public abstract class OptionBase implements Option {
             Optional<T> oldValueOpt = (Optional<T>) optionCache.delete(new OptionCacheKey(hierarchy, SPECIFIC_RANK, hierarchyRank, optionKey));
             T oldValue = oldValueOpt.orElse(null);
             OptionChangeMessage<T> event = new OptionChangeMessage<>(optionKey, hierarchy, hierarchyRank, oldValue, true);
-            globalBusProvider.get().publish(event);
+            globalBusProvider.get().publishASync(event);
             return oldValue;
         } else {
             throw new OptionPermissionFailedException("Permission to edit option refused");
