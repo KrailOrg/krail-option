@@ -22,7 +22,6 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 import uk.q3c.krail.eventbus.MessageBus;
-import uk.q3c.krail.eventbus.MessageBusProvider;
 import uk.q3c.krail.i18n.I18NKey;
 import uk.q3c.krail.option.Option;
 import uk.q3c.krail.option.OptionChangeMessage;
@@ -55,9 +54,6 @@ public class DefaultOptionTest {
     Class<MockContext2> context2 = MockContext2.class;
 
     @Mock
-    MessageBusProvider singletonMessageBusProvider;
-
-    @Mock
     MessageBus globalBus;
 
     @Mock
@@ -74,9 +70,8 @@ public class DefaultOptionTest {
     public void setup() {
         permissionVerifier = new MockOptionPermissionVerifier();
         when(defaultHierarchy.highestRankName()).thenReturn("ds");
-        when(singletonMessageBusProvider.get()).thenReturn(globalBus);
         contextObject = new MockOptionContext();
-        option = new DefaultOption(optionCache, defaultHierarchy, permissionVerifier, singletonMessageBusProvider);
+        option = new DefaultOption(optionCache, defaultHierarchy, permissionVerifier, globalBus);
         optionKey1 = new OptionKey<>(5, context, TestLabelKey.key1, "q");
         optionKey2 = new OptionKey<>(5, context2, TestLabelKey.key1, "q");
         messageCaptor = ArgumentCaptor.forClass(OptionChangeMessage.class);

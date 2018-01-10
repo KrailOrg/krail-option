@@ -16,7 +16,7 @@ package uk.q3c.krail.option.option;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.q3c.krail.eventbus.MessageBusProvider;
+import uk.q3c.krail.eventbus.MessageBus;
 import uk.q3c.krail.option.Option;
 import uk.q3c.krail.option.OptionPermissionVerifier;
 import uk.q3c.krail.option.UserHierarchy;
@@ -34,7 +34,7 @@ public class DefaultOption extends OptionBase {
     private static Logger log = LoggerFactory.getLogger(DefaultOption.class);
 
     @Inject
-    public DefaultOption(OptionCache optionCache, @UserHierarchyDefault UserHierarchy hierarchy, OptionPermissionVerifier permissionVerifier, MessageBusProvider singletonMessageBusProvider) {
-        super(optionCache, hierarchy, permissionVerifier, singletonMessageBusProvider);
+    public DefaultOption(OptionCache optionCache, @UserHierarchyDefault UserHierarchy hierarchy, OptionPermissionVerifier permissionVerifier, MessageBus messageBus) {
+        super(optionCache, hierarchy, permissionVerifier, messageBus);
     }
 }
