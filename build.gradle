@@ -41,7 +41,7 @@ sourceCompatibility = '1.8'
 
 kaytee {
     version {
-        number = "0.12.4.0"
+        number = "0.12.6.0"
     }
 }
 
@@ -51,7 +51,7 @@ bintray {
 }
 
 dependencies {
-    compile 'uk.q3c.krail:krail-i18n:0.10.4.0'
+    compile 'uk.q3c.krail:krail-i18n:0.10.5.0'
     compile 'org.reflections:reflections:0.9.10'
     testCompile 'org.spockframework:spock-core:1.1-groovy-2.4'
     testCompile 'cglib:cglib-nodep:3.2.0' // needed for Spock mocking
@@ -61,7 +61,7 @@ dependencies {
     testCompile 'com.mycila:mycila-guice:2.10.ga'
     testCompile 'com.mycila.testing.plugins:mycila-testing-guice:2.8'
     testCompile 'uk.q3c.util:q3c-testutils:0.11.0.4'
-    testCompile 'uk.q3c.krail:eventbus-mbassador:0.4.0.0'
+    testCompile 'uk.q3c.krail:eventbus-mbassador:0.5.0.0'
 
 
 }
@@ -74,5 +74,5 @@ idea {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.2.1'
+    gradleVersion = '4.4.1'
 }
