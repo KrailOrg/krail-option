@@ -13,7 +13,7 @@
 
 package uk.q3c.krail.option.option;
 
-import uk.q3c.krail.eventbus.MessageBusProvider;
+import uk.q3c.krail.eventbus.MessageBus;
 import uk.q3c.krail.option.Option;
 import uk.q3c.krail.option.OptionChangeMessage;
 import uk.q3c.krail.option.OptionEditAction;
@@ -58,13 +58,13 @@ public abstract class OptionBase implements Option {
     private UserHierarchy hierarchy;
     private OptionCache optionCache;
     private OptionPermissionVerifier permissionVerifier;
-    private MessageBusProvider globalBusProvider;
+    private MessageBus messageBus;
 
-    protected OptionBase(OptionCache optionCache, UserHierarchy hierarchy, OptionPermissionVerifier permissionVerifier, MessageBusProvider globalBusProvider) {
+    protected OptionBase(OptionCache optionCache, UserHierarchy hierarchy, OptionPermissionVerifier permissionVerifier, MessageBus messageBus) {
         this.hierarchy = hierarchy;
         this.optionCache = optionCache;
         this.permissionVerifier = permissionVerifier;
-        this.globalBusProvider = globalBusProvider;
+        this.messageBus = messageBus;
     }
 
     @Override
@@ -93,7 +93,7 @@ public abstract class OptionBase implements Option {
             T oldValue = getSpecificRanked(hierarchyRank, optionKey);
             optionCache.write(new OptionCacheKey<>(hierarchy, SPECIFIC_RANK, hierarchyRank, optionKey), Optional.of(value));
             OptionChangeMessage<T> event = new OptionChangeMessage<>(optionKey, hierarchy, hierarchyRank, oldValue, value);
-            globalBusProvider.get().publishASync(event);
+            messageBus.publishASync(event);
         } else {
             throw new OptionPermissionFailedException("Permission to edit option refused");
         }
@@ -156,7 +156,7 @@ public abstract class OptionBase implements Option {
             Optional<T> oldValueOpt = (Optional<T>) optionCache.delete(new OptionCacheKey(hierarchy, SPECIFIC_RANK, hierarchyRank, optionKey));
             T oldValue = oldValueOpt.orElse(null);
             OptionChangeMessage<T> event = new OptionChangeMessage<>(optionKey, hierarchy, hierarchyRank, oldValue, true);
-            globalBusProvider.get().publishASync(event);
+            messageBus.publishASync(event);
             return oldValue;
         } else {
             throw new OptionPermissionFailedException("Permission to edit option refused");
