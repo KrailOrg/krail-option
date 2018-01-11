@@ -22,7 +22,7 @@ import uk.q3c.krail.option.persist.OptionDaoDelegate;
 import uk.q3c.krail.option.persist.OptionDaoProviders;
 import uk.q3c.krail.option.persist.OptionSource;
 import uk.q3c.krail.persist.PersistenceInfo;
-import uk.q3c.util.MessageFormat;
+import uk.q3c.util.text.MessageFormat2;
 
 import java.lang.annotation.Annotation;
 import java.util.Map;
@@ -38,14 +38,16 @@ public class DefaultOptionSource implements OptionSource {
 
     protected Injector injector;
     private Class<? extends Annotation> activeSource;
+    private MessageFormat2 messageFormat;
     private Map<Class<? extends Annotation>, PersistenceInfo<?>> optionDaoProviders;
 
     @Inject
     protected DefaultOptionSource(Injector injector, @OptionDaoProviders Map<Class<? extends Annotation>, PersistenceInfo<?>> optionDaoProviders,
-                                  @ActiveOptionSourceDefault Class<? extends Annotation> activeSource) {
+                                  @ActiveOptionSourceDefault Class<? extends Annotation> activeSource, MessageFormat2 messageFormat) {
         this.injector = injector;
         this.optionDaoProviders = optionDaoProviders;
         this.activeSource = activeSource;
+        this.messageFormat = messageFormat;
     }
 
     @Override
@@ -64,7 +66,7 @@ public class DefaultOptionSource implements OptionSource {
     protected void checkAnnotationKey(Class<? extends Annotation> annotationClass) {
         checkNotNull(annotationClass);
         if (!optionDaoProviders.containsKey(annotationClass)) {
-            String msg = MessageFormat.format("The OptionDaoDelegate annotation of '{0}' does not match any of the providers. Have you enabled the Dao, for example:' new InMemoryModule().provideOptionDao()'", annotationClass.getSimpleName
+            String msg = messageFormat.format("The OptionDaoDelegate annotation of '{0}' does not match any of the providers. Have you enabled the Dao, for example:' new InMemoryModule().provideOptionDao()'", annotationClass.getSimpleName
                     ());
             throw new OptionConfigurationException(msg);
         }
