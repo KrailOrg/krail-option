@@ -21,6 +21,7 @@ import uk.q3c.krail.i18n.I18NKey;
 import uk.q3c.krail.option.OptionContext;
 import uk.q3c.krail.option.OptionKey;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,7 +33,7 @@ import java.util.Set;
  * <p>
  * Created by David Sowerby on 07/08/15.
  */
-public class OptionKeyLocator {
+public class OptionKeyLocator implements Serializable {
     private static Logger log = LoggerFactory.getLogger(OptionKeyLocator.class);
 
 
