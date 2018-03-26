@@ -14,8 +14,6 @@
 package uk.q3c.krail.option.option;
 
 import com.google.inject.Inject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import uk.q3c.krail.eventbus.MessageBus;
 import uk.q3c.krail.option.Option;
 import uk.q3c.krail.option.OptionPermissionVerifier;
@@ -24,6 +22,7 @@ import uk.q3c.krail.option.UserHierarchyDefault;
 import uk.q3c.krail.option.persist.OptionCache;
 import uk.q3c.krail.option.persist.OptionDaoDelegate;
 import uk.q3c.krail.option.persist.cache.DefaultOptionCacheLoader;
+import uk.q3c.util.guice.SerializationSupport;
 
 /**
  * * <b>NOTE:</b> All values to and from {@link Option} are natively typed.  All values to and from {@link OptionCache}, {@link DefaultOptionCacheLoader} and
@@ -31,10 +30,9 @@ import uk.q3c.krail.option.persist.cache.DefaultOptionCacheLoader;
  */
 
 public class DefaultOption extends OptionBase {
-    private static Logger log = LoggerFactory.getLogger(DefaultOption.class);
 
     @Inject
-    public DefaultOption(OptionCache optionCache, @UserHierarchyDefault UserHierarchy hierarchy, OptionPermissionVerifier permissionVerifier, MessageBus messageBus) {
-        super(optionCache, hierarchy, permissionVerifier, messageBus);
+    public DefaultOption(OptionCache optionCache, @UserHierarchyDefault UserHierarchy hierarchy, OptionPermissionVerifier permissionVerifier, MessageBus messageBus, SerializationSupport serializationSupport) {
+        super(optionCache, hierarchy, permissionVerifier, messageBus, serializationSupport);
     }
 }

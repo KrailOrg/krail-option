@@ -26,7 +26,10 @@ import uk.q3c.krail.option.persist.OptionCache;
 import uk.q3c.krail.option.persist.OptionCacheKey;
 import uk.q3c.krail.option.persist.OptionDaoDelegate;
 import uk.q3c.krail.option.persist.cache.DefaultOptionCacheLoader;
+import uk.q3c.util.guice.SerializationSupport;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -59,12 +62,14 @@ public abstract class OptionBase implements Option {
     private OptionCache optionCache;
     private OptionPermissionVerifier permissionVerifier;
     private MessageBus messageBus;
+    private SerializationSupport serializationSupport;
 
-    protected OptionBase(OptionCache optionCache, UserHierarchy hierarchy, OptionPermissionVerifier permissionVerifier, MessageBus messageBus) {
+    protected OptionBase(OptionCache optionCache, UserHierarchy hierarchy, OptionPermissionVerifier permissionVerifier, MessageBus messageBus, SerializationSupport serializationSupport) {
         this.hierarchy = hierarchy;
         this.optionCache = optionCache;
         this.permissionVerifier = permissionVerifier;
         this.messageBus = messageBus;
+        this.serializationSupport = serializationSupport;
     }
 
     @Override
@@ -161,6 +166,10 @@ public abstract class OptionBase implements Option {
         } else {
             throw new OptionPermissionFailedException("Permission to edit option refused");
         }
+    }
+
+    private void readObject(ObjectInputStream inputStream) throws ClassNotFoundException, IOException {
+        serializationSupport.deserialize(this, inputStream);
     }
 
 }

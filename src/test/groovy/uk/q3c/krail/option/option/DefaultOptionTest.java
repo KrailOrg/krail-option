@@ -33,6 +33,7 @@ import uk.q3c.krail.option.mock.MockOptionContext;
 import uk.q3c.krail.option.mock.MockOptionPermissionVerifier;
 import uk.q3c.krail.option.persist.OptionCache;
 import uk.q3c.krail.option.persist.OptionCacheKey;
+import uk.q3c.util.guice.SerializationSupport;
 
 import java.util.List;
 import java.util.Optional;
@@ -64,6 +65,9 @@ public class DefaultOptionTest {
     private OptionKey<Integer> optionKey2;
     private MockOptionPermissionVerifier permissionVerifier;
 
+    @Mock
+    private SerializationSupport serializationSupport;
+
     ArgumentCaptor<OptionChangeMessage> messageCaptor;
 
     @Before
@@ -71,7 +75,7 @@ public class DefaultOptionTest {
         permissionVerifier = new MockOptionPermissionVerifier();
         when(defaultHierarchy.highestRankName()).thenReturn("ds");
         contextObject = new MockOptionContext();
-        option = new DefaultOption(optionCache, defaultHierarchy, permissionVerifier, globalBus);
+        option = new DefaultOption(optionCache, defaultHierarchy, permissionVerifier, globalBus, serializationSupport);
         optionKey1 = new OptionKey<>(5, context, TestLabelKey.key1, "q");
         optionKey2 = new OptionKey<>(5, context2, TestLabelKey.key1, "q");
         messageCaptor = ArgumentCaptor.forClass(OptionChangeMessage.class);
@@ -145,7 +149,7 @@ public class DefaultOptionTest {
     }
 
     @Test
-    public void get_specific() throws Exception {
+    public void get_specific() {
         //given
         when(defaultHierarchy.lowestRankName()).thenReturn("low");
         OptionCacheKey<Integer> cacheKey = new OptionCacheKey<>(defaultHierarchy, SPECIFIC_RANK, optionKey2);
@@ -157,7 +161,7 @@ public class DefaultOptionTest {
     }
 
     @Test
-    public void get_specific_not_found_return_default() throws Exception {
+    public void get_specific_not_found_return_default() {
         //given
         when(defaultHierarchy.lowestRankName()).thenReturn("low");
         OptionCacheKey<Integer> cacheKey = new OptionCacheKey<>(defaultHierarchy, SPECIFIC_RANK, optionKey2);
@@ -169,7 +173,7 @@ public class DefaultOptionTest {
     }
 
     @Test
-    public void get_specific_null_return_default() throws Exception {
+    public void get_specific_null_return_default() {
         //given
         when(defaultHierarchy.lowestRankName()).thenReturn("low");
         OptionCacheKey<Integer> cacheKey = new OptionCacheKey<>(defaultHierarchy, SPECIFIC_RANK, optionKey2);
@@ -196,7 +200,7 @@ public class DefaultOptionTest {
     protected Answer<Optional<Integer>> answerOf(Integer value) {
         return new Answer<Optional<Integer>>() {
             @Override
-            public Optional<Integer> answer(InvocationOnMock invocation) throws Throwable {
+            public Optional<Integer> answer(InvocationOnMock invocation) {
                 return Optional.of(value);
             }
         };
