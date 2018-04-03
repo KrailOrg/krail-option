@@ -61,7 +61,7 @@ public abstract class OptionBase implements Option {
     private UserHierarchy hierarchy;
     private OptionCache optionCache;
     private OptionPermissionVerifier permissionVerifier;
-    private MessageBus messageBus;
+    private transient MessageBus messageBus;
     private SerializationSupport serializationSupport;
 
     protected OptionBase(OptionCache optionCache, UserHierarchy hierarchy, OptionPermissionVerifier permissionVerifier, MessageBus messageBus, SerializationSupport serializationSupport) {
@@ -169,7 +169,8 @@ public abstract class OptionBase implements Option {
     }
 
     private void readObject(ObjectInputStream inputStream) throws ClassNotFoundException, IOException {
-        serializationSupport.deserialize(this, inputStream);
+        inputStream.defaultReadObject();
+        serializationSupport.deserialize(this);
     }
 
 }

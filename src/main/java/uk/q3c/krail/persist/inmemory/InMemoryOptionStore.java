@@ -16,6 +16,7 @@ package uk.q3c.krail.persist.inmemory;
 
 import uk.q3c.krail.option.persist.OptionId;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,7 +26,7 @@ import java.util.Optional;
  * <p>
  * Created by David Sowerby on 04/12/14.
  */
-public interface InMemoryOptionStore {
+public interface InMemoryOptionStore extends Serializable {
 
     /**
      * Gets the entity for {@code optionId}

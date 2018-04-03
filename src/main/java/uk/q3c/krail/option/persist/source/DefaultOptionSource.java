@@ -22,8 +22,11 @@ import uk.q3c.krail.option.persist.OptionDaoDelegate;
 import uk.q3c.krail.option.persist.OptionDaoProviders;
 import uk.q3c.krail.option.persist.OptionSource;
 import uk.q3c.krail.persist.PersistenceInfo;
+import uk.q3c.util.guice.SerializationSupport;
 import uk.q3c.util.text.MessageFormat2;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 
@@ -36,18 +39,20 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class DefaultOptionSource implements OptionSource {
 
-    protected Injector injector;
+    protected transient Injector injector;
     private Class<? extends Annotation> activeSource;
     private MessageFormat2 messageFormat;
+    private SerializationSupport serializationSupport;
     private Map<Class<? extends Annotation>, PersistenceInfo<?>> optionDaoProviders;
 
     @Inject
     protected DefaultOptionSource(Injector injector, @OptionDaoProviders Map<Class<? extends Annotation>, PersistenceInfo<?>> optionDaoProviders,
-                                  @ActiveOptionSourceDefault Class<? extends Annotation> activeSource, MessageFormat2 messageFormat) {
+                                  @ActiveOptionSourceDefault Class<? extends Annotation> activeSource, MessageFormat2 messageFormat, SerializationSupport serializationSupport) {
         this.injector = injector;
         this.optionDaoProviders = optionDaoProviders;
         this.activeSource = activeSource;
         this.messageFormat = messageFormat;
+        this.serializationSupport = serializationSupport;
     }
 
     @Override
@@ -92,6 +97,11 @@ public class DefaultOptionSource implements OptionSource {
     @Override
     public void setActiveSource(Class<? extends Annotation> activeSource) {
         this.activeSource = activeSource;
+    }
+
+    private void readObject(ObjectInputStream inputStream) throws ClassNotFoundException, IOException {
+        inputStream.defaultReadObject();
+        serializationSupport.deserialize(this);
     }
 
 

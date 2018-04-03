@@ -22,9 +22,10 @@ import uk.q3c.krail.option.persist.OptionCacheKey;
 import uk.q3c.krail.option.persist.OptionDao;
 import uk.q3c.krail.persist.inmemory.store.DefaultInMemoryOptionStore;
 
+import java.io.Serializable;
 import java.util.Optional;
 
-import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Extends {@link CacheLoader} implementation which finds the options appropriate for the key provided (see {@link
@@ -39,7 +40,7 @@ import static com.google.common.base.Preconditions.*;
  * <p>
  * Created by David Sowerby on 19/02/15.
  */
-public class DefaultOptionCacheLoader extends CacheLoader<OptionCacheKey, Optional<?>> {
+public class DefaultOptionCacheLoader extends CacheLoader<OptionCacheKey, Optional<?>> implements Serializable {
     private static Logger log = LoggerFactory.getLogger(DefaultOptionCacheLoader.class);
     private final OptionDao daoWrapper;
 
@@ -62,7 +63,7 @@ public class DefaultOptionCacheLoader extends CacheLoader<OptionCacheKey, Option
      */
     @Override
 
-    public Optional<?> load(final OptionCacheKey cacheKey) throws Exception {
+    public Optional<?> load(final OptionCacheKey cacheKey) {
         checkNotNull(cacheKey);
         log.debug("retrieving value for {}", cacheKey);
         return daoWrapper.getValue(cacheKey);

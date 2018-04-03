@@ -11,7 +11,7 @@
  *
  */
 buildscript {
-    ext.kaytee_plugin_version = "0.18.10.0"
+    ext.kaytee_plugin_version = "0.20.1.0"
     repositories {
         jcenter()
     }
@@ -52,7 +52,6 @@ bintray {
 
 dependencies {
     compile 'uk.q3c.krail:krail-i18n:0.11.0.0'
-    compile 'uk.q3c.krail:krail-option-api:0.18.1.0'
     compile 'org.reflections:reflections:0.9.10'
     testCompile 'org.spockframework:spock-core:1.1-groovy-2.4'
     testCompile 'cglib:cglib-nodep:3.2.0' // needed for Spock mocking
@@ -62,7 +61,7 @@ dependencies {
     testCompile 'com.mycila:mycila-guice:2.10.ga'
     testCompile 'com.mycila.testing.plugins:mycila-testing-guice:2.8'
     testCompile 'uk.q3c.util:q3c-testutils:0.11.0.4'
-    testCompile 'uk.q3c.krail:eventbus-mbassador:0.5.0.0'
+    testCompile 'uk.q3c.krail:eventbus-mbassador:0.6.0.0'
 
 
 }
