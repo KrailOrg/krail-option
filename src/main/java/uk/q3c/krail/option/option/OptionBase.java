@@ -59,7 +59,7 @@ import static uk.q3c.krail.option.RankOption.SPECIFIC_RANK;
 public abstract class OptionBase implements Option {
 
     private UserHierarchy hierarchy;
-    private OptionCache optionCache;
+    private transient OptionCache optionCache;
     private OptionPermissionVerifier permissionVerifier;
     private transient MessageBus messageBus;
     private SerializationSupport serializationSupport;
