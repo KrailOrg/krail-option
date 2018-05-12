@@ -19,6 +19,8 @@ import uk.q3c.krail.option.OptionKey;
 import uk.q3c.krail.option.UserHierarchy;
 import uk.q3c.krail.option.persist.OptionCache;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -35,14 +37,14 @@ import static org.mockito.Mockito.when;
  */
 public class MockOption implements Option {
 
-    private UserHierarchy hierarchy = mock(UserHierarchy.class);
+    private transient UserHierarchy hierarchy;
     private Map<OptionKey, Optional<Object>> optionMap;
-    private OptionCache optionCache = mock(OptionCache.class);
+    private transient OptionCache optionCache;
 
     @Inject
     public MockOption() {
         optionMap = new HashMap<>();
-        when(hierarchy.lowestRank()).thenReturn(5);
+        setup();
     }
 
     @Override
@@ -109,6 +111,17 @@ public class MockOption implements Option {
     @Override
     public <T> Optional<T> getValueFromCache(OptionKey<T> key, int hierarchyRank) {
         throw new UnsupportedOperationException("Method 'getValueFromCache' is not supported by MockOption");
+    }
+
+    private void readObject(ObjectInputStream inputStream) throws ClassNotFoundException, IOException {
+        inputStream.defaultReadObject();
+        setup();
+    }
+
+    private void setup() {
+        hierarchy = mock(UserHierarchy.class);
+        optionCache = mock(OptionCache.class);
+        when(hierarchy.lowestRank()).thenReturn(5);
     }
 
 

@@ -24,12 +24,14 @@ import uk.q3c.krail.option.persist.OptionDaoDelegate;
 import uk.q3c.krail.option.persist.cache.DefaultOptionCacheLoader;
 import uk.q3c.util.guice.SerializationSupport;
 
+import java.io.Serializable;
+
 /**
  * * <b>NOTE:</b> All values to and from {@link Option} are natively typed.  All values to and from {@link OptionCache}, {@link DefaultOptionCacheLoader} and
  * {@link OptionDaoDelegate} are wrapped in Optional.
  */
 
-public class DefaultOption extends OptionBase {
+public class DefaultOption extends OptionBase implements Serializable {
 
     @Inject
     public DefaultOption(OptionCache optionCache, @UserHierarchyDefault UserHierarchy hierarchy, OptionPermissionVerifier permissionVerifier, MessageBus messageBus, SerializationSupport serializationSupport) {
